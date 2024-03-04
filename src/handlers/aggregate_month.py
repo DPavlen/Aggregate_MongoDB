@@ -1,10 +1,17 @@
 import json
 import os
+from typing import Any
+
 from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime
 from bson import ObjectId
 
 from aiogram import types, F, Router
+from aiogram.types import CallbackQuery
+from aiogram.dispatcher import FSMContext
+from aiogram.handlers import CallbackQueryHandler
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = Router()
 
@@ -13,8 +20,8 @@ MONGODB_DB = os.getenv('MONGODB_DB')
 MONGODB_COLLECTION = os.getenv('MONGODB_COLLECTION')
 
 
-@router.message(F.text)
-async def aggregate_month():
+@router.message(F.text == "Агрегация по месяцу")
+async def aggregate_month(message: types.Message, session: AsyncSession):
     # Подключение к MongoDB
     client = AsyncIOMotorClient("MONGODB_URI")
     db = client["MONGODB_DB"]
@@ -70,11 +77,18 @@ async def aggregate_month():
             },
         },
     ]
-
+    # await collection.aggregate(pipeline).to_list(length=None)
     result = await collection.aggregate(pipeline).to_list(length=None)
 
     client.close()
-
     # Обработка результата
     return result
 
+
+
+# @router.callback_query(F.data == "month")
+@router.callback_query()
+class MyHandler(CallbackQueryHandler):
+    async def handle(self) -> Any:
+        # return await aggregate_month(self.message, self.callback_data)
+        await self.event.answer("Hello!")
