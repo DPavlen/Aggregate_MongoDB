@@ -14,6 +14,7 @@ from aiogram.types import (ReplyKeyboardMarkup,
 # )
 
 # Создаем клавиатуру и потом добавляем в нее кнопки
+# При нажатии определяется событие клика на кнопку
 menu = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Агрегация по месяцу", callback_data="month")],
     [InlineKeyboardButton(text="Агрегация по дню")],
